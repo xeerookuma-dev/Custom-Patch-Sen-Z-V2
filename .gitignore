@@ -2,3 +2,4 @@ zig-out/
 .zig-cache/
 .direnv/
 discord-notify.sh
+discord-notify.ps1
