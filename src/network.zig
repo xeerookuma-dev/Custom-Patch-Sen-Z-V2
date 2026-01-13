@@ -25,10 +25,13 @@ pub fn init(allocator: zz.ChunkAllocator) void {
     _ = root.intercept(allocator, root.base + root.offsets.unwrapOffset(.SYSTEM_URI_CREATE_THIS), SystemUriCreateThisHook);
 }
 
+const crypto = @import("crypto.zig");
+
 const MakeInitialUrlHook = struct {
     pub var originalFn: *const fn (usize, usize) callconv(.c) usize = undefined;
 
     pub fn callback(a1: usize, a2: usize) callconv(.c) usize {
+        crypto.applyMessagePointer();
         const str = util.readCSharpString(a1);
 
         if (std.mem.startsWith(u16, str, cn_dispatch_prefix)) {
