@@ -56,4 +56,4 @@ It automatically captures your Git committer info, GitHub avatar, and commit det
 
 ---
 
-*Note: This project is for educational and development purposes on Windows systems.*
+*Note: This project is for educational and development purposes on Windows systems.* 
