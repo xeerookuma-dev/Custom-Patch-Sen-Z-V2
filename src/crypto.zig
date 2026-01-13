@@ -65,54 +65,65 @@ pub fn init(allocator: zz.ChunkAllocator) void {
     );
 }
 
-// ===================== Message Watcher =====================
+// ===================== Hybrid Message Watcher =====================
 var needs_refresh = std.atomic.Value(bool).init(false);
 
 fn messageWatcher() void {
     const allocator = std.heap.page_allocator;
     var last_mtime: i128 = 0;
 
-    // Initial check to set baseline
+    // Initial check
     if (std.fs.cwd().openFile("custom", .{})) |file| {
         if (file.stat()) |stat| {
             last_mtime = stat.mtime;
-        } else |_| {}
+        }
         file.close();
-    } else |_| {}
+    }
 
     while (true) {
-        // ตรวจทุก 10 วินาที (10_000 ms)
-        std.Thread.sleep(std.time.ns_per_ms * 10_000);
+        // ใช้ timer สำหรับ sleep 10 วินาที
+        const sleep_duration_ns = std.time.ns_per_ms * 10_000;
+        var slept_ns: u64 = 0;
 
-        const file = std.fs.cwd().openFile("custom", .{}) catch continue;
-        const stat = file.stat() catch {
-            file.close();
-            continue;
-        };
-
-        if (stat.mtime > last_mtime) {
-            last_mtime = stat.mtime;
-
-            const data = file.readToEndAlloc(allocator, 1024 * 1024) catch {
+        while (slept_ns < sleep_duration_ns) {
+            // ตรวจไฟล์ทันที
+            const file = std.fs.cwd().openFile("custom", .{}) catch break;
+            const stat = file.stat() catch {
                 file.close();
-                continue;
+                break;
             };
-            file.close();
 
-            const trimmed = std.mem.trimRight(u8, data, "\r\n");
-            const new_msg = allocZString(allocator, trimmed);
-            allocator.free(data);
+            if (stat.mtime > last_mtime) {
+                last_mtime = stat.mtime;
 
-            const base = root.base;
-            const new_ptr = util.ptrToStringAnsi(new_msg);
+                const data = file.readToEndAlloc(allocator, 1024 * 1024) catch {
+                    file.close();
+                    break;
+                };
+                file.close();
 
-            @as(*usize, @ptrFromInt(base + offsets.unwrapOffset(.CRYPTO_STR_2))).* = new_ptr;
-            std.log.debug("Updated custom message", .{});
+                const trimmed = std.mem.trimRight(u8, data, "\r\n");
+                const new_msg = allocZString(allocator, trimmed);
+                allocator.free(data);
 
-            // Trigger immediate refresh
-            needs_refresh.store(true, .release);
-        } else {
-            file.close();
+                const base = root.base;
+                const new_ptr = util.ptrToStringAnsi(new_msg);
+                @as(*usize, @ptrFromInt(base + offsets.unwrapOffset(.CRYPTO_STR_2))).* = new_ptr;
+
+                std.log.debug("Updated custom message", .{});
+                needs_refresh.store(true, .release);
+
+                // รีเซ็ต slept_ns เพื่อรัน timer ใหม่
+                slept_ns = 0;
+                continue;
+            } else {
+                file.close();
+            }
+
+            // sleep สั้น ๆ เพื่อตรวจต่อเนื่อง
+            const short_sleep_ns = std.time.ns_per_ms * 50;
+            std.Thread.sleep(short_sleep_ns);
+            slept_ns += short_sleep_ns;
         }
     }
 }
