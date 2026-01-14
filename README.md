@@ -24,10 +24,6 @@ A powerful and lightweight custom patch injector and network utility for game op
    cd Custom-Patch-Sen-Z-V2
    ```
 
-2. **Configure Discord Notifications**:
-   - For PowerShell users, edit `discord-notify.ps1` and add your Webhook URL.
-   - For Bash/Git Bash users, edit `discord-notify.sh`.
-
 ## 🔨 Build Instructions
 
 To build the project on Windows:
@@ -42,18 +38,4 @@ zig build -Doptimize=ReleaseSafe
 
 The output executables will be located in the `zig-out\bin` directory.
 
-## 🔗 Configuration
-
-### Discord Webhook (PowerShell)
-
-You can use the native PowerShell script to send notifications:
-
-```powershell
-.\discord-notify.ps1
-```
-
-It automatically captures your Git committer info, GitHub avatar, and commit details.
-
 ---
-
-*Note: This project is for educational and development purposes on Windows systems.* 
