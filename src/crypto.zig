@@ -11,13 +11,43 @@ const custom_message_default = @embedFile("custom"); // Fallback default
 var msg_buffer: [4096]u8 = undefined;
 
 fn readCustomMessage() ![]const u8 {
-    // Try to open "custom" in current working directory (usually game folder)
-    const file = try std.fs.cwd().openFile("custom", .{});
+    // Static buffer for path operations
+    var path_buf: [std.fs.max_path_bytes]u8 = undefined;
+    var fba = std.heap.FixedBufferAllocator.init(&path_buf);
+    const allocator = fba.allocator();
+
+    // Get executable directory
+    var exe_buf: [std.fs.max_path_bytes]u8 = undefined;
+    const exe_path = try std.fs.selfExePath(&exe_buf);
+    const exe_dir = std.fs.path.dirname(exe_path) orelse ".";
+
+    // Build path to custom file
+    const custom_path = try std.fs.path.join(allocator, &[_][]const u8{ exe_dir, "custom" });
+
+    // Read the custom file into static buffer
+    const file = try std.fs.cwd().openFile(custom_path, .{});
     defer file.close();
 
-    // Read content into static buffer
     const bytes_read = try file.readAll(&msg_buffer);
+
+    // Ensure null termination for C-string compatibility
+    if (bytes_read < msg_buffer.len) {
+        msg_buffer[bytes_read] = 0;
+    } else {
+        msg_buffer[msg_buffer.len - 1] = 0;
+    }
+
     return msg_buffer[0..bytes_read];
+}
+
+pub fn monitorCustomMessage() void {
+    while (true) {
+        std.Thread.sleep(std.time.ns_per_s * 2);
+
+        const msg = readCustomMessage() catch continue;
+        const base = root.base;
+        @as(*usize, @ptrFromInt(base + offsets.unwrapOffset(.CRYPTO_STR_2))).* = util.ptrToStringAnsi(msg);
+    }
 }
 
 pub fn init(allocator: zz.ChunkAllocator) void {
@@ -25,13 +55,20 @@ pub fn init(allocator: zz.ChunkAllocator) void {
 
     @as(*usize, @ptrFromInt(base + offsets.unwrapOffset(.CRYPTO_STR_1))).* = util.ptrToStringAnsi(sdk_public_key);
 
-    // Try to read custom message from file, fallback to embedded default
+    // Initial read
     const custom_msg = readCustomMessage() catch |err| blk: {
         std.log.warn("Failed to read custom file: {}, using default message", .{err});
         break :blk custom_message_default;
     };
 
     @as(*usize, @ptrFromInt(base + offsets.unwrapOffset(.CRYPTO_STR_2))).* = util.ptrToStringAnsi(custom_msg);
+
+    // Spawn monitor thread
+    const thread = std.Thread.spawn(.{}, monitorCustomMessage, .{}) catch |err| {
+        std.log.err("Failed to spawn monitor thread: {}", .{err});
+        return; // Continue without monitoring if spawn fails
+    };
+    thread.detach();
 
     initializeRsaCryptoServiceProvider();
 

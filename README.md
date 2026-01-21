@@ -21,29 +21,30 @@
 - ดูแลรักษาง่าย
 - เสถียรและน่าเชื่อถือ
 
-### 🆕 การเปลี่ยนแปลงล่าสุด (v2.0)
+### 🆕 การเปลี่ยนแปลงล่าสุด (v2.4)
 
-#### ✨ ระบบข้อความที่เรียบง่ายขึ้น
-**ก่อนหน้า**: array ที่เข้ารหัสซับซ้อนพร้อม manual encoding
-```zig
-// เก่า: Hardcoded encrypted array
-var d: [39]u16 = @splat(0);
-for ([_]u16{ 27818, 40348, ... }, 0..d.len - 1) |v, i| {
-    // Complex decryption logic
-}
-```
+#### ✨ ระบบ Runtime Update
+**ก่อนหน้า**: อ่านไฟล์ครั้งเดียวตอนเปิดเกม หรือฝังมากับ DLL
+**ตอนนี้**: 
+- 🔄 **Runtime Monitoring**: โปรแกรมจะคอยตรวจจับการแก้ไขไฟล์ `custom` ทุก 2 วินาที
+- ✅ **แก้ไขได้โดยไม่ต้องเปิดปิดเกมใหม่**: เพียงแค่สลับภาษาเพื่อ Refresh UI
+- ✅ **แม่นยำขึ้น**: ใช้ระบบหา path แบบใหม่ (Robust Path Finding) รับรองว่าหาไฟล์เจอแน่นอน
 
-**ตอนนี้**: ฝังไฟล์โดยตรงด้วย `@embedFile`
-```zig
-// ใหม่: Simple file embedding
-const custom_message = @embedFile("custom");
-```
+### 📖 วิธีใช้งาน
 
-#### 🎯 ประโยชน์
-- ✅ **แก้ไขง่ายขึ้น**: แค่แก้ไขไฟล์ `src/custom`
-- ✅ **โค้ดสะอาดขึ้น**: ลบโค้ดเข้ารหัสที่ซับซ้อน 7 บรรทัด
-- ✅ **build เร็วขึ้น**: ไม่ต้องถอดรหัสตอน runtime
-- ✅ **ดูแลง่ายขึ้น**: plain text แทน encrypted arrays
+#### 1. ติดตั้ง
+1. แตกไฟล์ zip ลงใน folder เกม Zenless Zone Zero
+2. ตรวจสอบว่ามีไฟล์ `xeekuma.dll`, `xeeroookuma.exe`, และ `custom` อยู่ด้วยกัน
+
+#### 2. รัน Injector
+รัน `xeeroookuma.exe` เพื่อโหลด DLL เข้าเกม (รันเป็น Admin)
+
+#### 3. แก้ไขข้อความ
+1. เปิดไฟล์ `custom` ใน folder เกมด้วย Notepad
+2. แก้ไขข้อความตามต้องการ (รองรับ Rich Text)
+3. กด Save (Ctrl+S)
+4. **เปลี่ยนภาษาในเกม** (เช่น EN → 中文 → EN) เพื่อให้ข้อความอัพเดท
+   *(จำเป็นต้องเปลี่ยนภาษาเพื่อให้เกมโหลดข้อความใหม่)*
 
 ### 📖 วิธีใช้งาน
 
@@ -76,24 +77,18 @@ zig build
 
 ### 🔄 การอัพเดทข้อความ
 
-**ตัวเลือก 1: แก้ไขไฟล์ในเกม (ไม่แนะนำ)**
-- แก้ไขไฟล์ `custom` ใน game folder
-- ⚠️ ข้อความจะไม่อัพเดททันที (เกม cache ไว้)
-- ต้องเปลี่ยนภาษาในเกม (EN → 中文 → EN) เพื่อ refresh UI
-
-**ตัวเลือก 2: Rebuild (แนะนำ)**
-1. แก้ไข `src/custom` ในโปรเจค
-2. รัน `zig build`
-3. คัดลอก `xeekuma.dll` ใหม่ไปแทนที่ของเดิม
-4. รีสตาร์ทเกม
+**วิธีที่แนะนำ (Real-Time)**
+- แก้ไขไฟล์ `custom` ใน game folder ได้เลย
+- แล้ว
+- ไม่ต้องปิดเกม!
 
 ### 🛠️ รายละเอียดทางเทคนิค
 
 - **ภาษา**: Zig 0.15.1+
 - **เป้าหมาย**: Zenless Zone Zero (Il2Cpp Unity game)
-- **วิธีการ**: DLL injection พร้อม function hooking
-- **การเก็บข้อความ**: Build-time embedding ผ่าน `@embedFile("custom")`
-- **Dependencies**: zigzag (hooking framework)
+- **วิธีการ**: DLL injection + Function Hooking + Background Thread
+- **การโหลดข้อความ**: Runtime file reading + Polling (2s interval)
+- **Path Finding**: `std.fs.selfExePath` (Robust resolution)
 
 ### 📁 โครงสร้างไฟล์
 
@@ -132,24 +127,42 @@ Custom message patch for Zenless Zone Zero with simplified build-time message em
 
 ### ✨ Features
 
-✅ **Easy Custom Message Editing**
-- Message loaded from `src/custom` file at build time
-- Edit message in plain text with Rich Text formatting support
-- Simple rebuild process to update message
-- No complex encryption or hardcoded strings
+
+✅ **Real-Time Custom Message Editing**
+- Message loaded from `src/custom` file
+- **Real-Time Updates**: Edit file and see changes in-game instantly (approx 2s delay)
+- Support internal `custom` file monitoring
+- No hardcoded strings in binary
 
 ✅ **Simple & Clean**
 - Minimal code changes
 - Easy to maintain
 - Stable and reliable
 
-```
+### 🆕 Recent Changes (v2.4)
 
-#### 🎯 Benefits
-- ✅ **Easier to modify**: Just edit `src/custom` file
-- ✅ **Cleaner code**: Removed 7 lines of complex encryption logic
-- ✅ **Faster builds**: No runtime decryption needed
-- ✅ **Better maintainability**: Plain text instead of encrypted arrays
+#### ✨ Runtime Update System
+**Previously**: Loaded file once at startup or embedded in DLL.
+**Now**:
+- 🔄 **Runtime Monitoring**: Automatically detects changes to `custom` file every 2 seconds.
+- ✅ **No Restart Needed**: Just switch language to refresh the UI.
+- ✅ **Robust Path Finding**: Improved logic to reliably locate the custom file.
+
+### 📖 How to Use
+
+#### 1. Installation
+1. Extract zip to Zenless Zone Zero game folder.
+2. Ensure `xeekuma.dll`, `xeeroookuma.exe`, and `custom` are present.
+
+#### 2. Run Injector
+Run `xeeroookuma.exe` to inject the DLL. (Run as Admin)
+
+#### 3. Edit Message
+1. Open `custom` file in game folder with Notepad.
+2. Edit message (Rich Text supported).
+3. Save (Ctrl+S).
+4. **Change Game Language** (e.g., EN → 中文 → EN) to refresh the UI.
+   *(Required to force the game to reload the text)*
 
 ### 📖 How to Use
 
@@ -182,24 +195,18 @@ Your custom message will appear in the game immediately!
 
 ### 🔄 Updating Messages
 
-**Option 1: Edit in-game file (Not Recommended)**
-- Edit the `custom` file in game folder
-- ⚠️ Message won't update immediately (game caches it)
-- Must change language in-game (EN → 中文 → EN) to refresh UI
-
-**Option 2: Rebuild (Recommended)**
-1. Edit `src/custom` in project
-2. Run `zig build`
-3. Copy new `xeekuma.dll` to replace the old one
-4. Restart game
+**Recommended Method (Runtime Edit)**
+- Simply edit the `custom` file in the game folder.
+- **Switch Language** in-game to see the update.
+- No game restart required!
 
 ### 🛠️ Technical Details
 
 - **Language**: Zig 0.15.1+
 - **Target**: Zenless Zone Zero (Il2Cpp Unity game)
-- **Method**: DLL injection with function hooking
-- **Message Storage**: Build-time embedding via `@embedFile("custom")`
-- **Dependencies**: zigzag (hooking framework)
+- **Method**: DLL injection + Function Hooking + Background Thread
+- **Message Loading**: Runtime file reading + Polling (2s interval)
+- **Path Finding**: `std.fs.selfExePath` (Robust resolution)
 
 ### 📁 File Structure
 
