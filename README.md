@@ -77,9 +77,9 @@ zig build
 
 ### 🔄 การอัพเดทข้อความ
 
-**วิธีที่แนะนำ (Real-Time)**
+**วิธีที่แนะนำ (Runtime Edit)**
 - แก้ไขไฟล์ `custom` ใน game folder ได้เลย
-- แล้ว
+- **เปลี่ยนภาษาในเกม** เพื่อ Refresh หน้าจอ
 - ไม่ต้องปิดเกม!
 
 ### 🛠️ รายละเอียดทางเทคนิค
@@ -128,9 +128,9 @@ Custom message patch for Zenless Zone Zero with simplified build-time message em
 ### ✨ Features
 
 
-✅ **Real-Time Custom Message Editing**
+✅ **Runtime Custom Message Editing**
 - Message loaded from `src/custom` file
-- **Real-Time Updates**: Edit file and see changes in-game instantly (approx 2s delay)
+- **Runtime Updates**: Edit file and switch language to see changes
 - Support internal `custom` file monitoring
 - No hardcoded strings in binary
 
