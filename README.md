@@ -26,10 +26,10 @@
 
 #### 1. ติดตั้ง
 1. แตกไฟล์ zip ลงใน folder เกม Zenless Zone Zero
-2. ตรวจสอบว่ามีไฟล์ `xeekuma.dll`, `xeeroookuma.exe`, และ `custom` อยู่ด้วยกัน
+2. ตรวจสอบว่ามีไฟล์ `xeroxua.dll`, `xeroxuakuma.exe`, และ `custom` อยู่ด้วยกัน
 
 #### 2. รัน Injector
-รัน `xeeroookuma.exe` เพื่อโหลด DLL เข้าเกม (รันเป็น Admin)
+รัน `xeroxuakuma.exe` เพื่อโหลด DLL เข้าเกม (รันเป็น Admin)
 
 #### 3. แก้ไขข้อความ
 1. เปิดไฟล์ `custom` ใน folder เกมด้วย Notepad
@@ -58,7 +58,7 @@ zig build
 
 #### 3. Deploy ไฟล์
 คัดลอกไฟล์ทั้งสองนี้ไปที่ folder เกม:
-- `zig-out/bin/xeekuma.dll` → Game folder
+- `zig-out/bin/xeroxua.dll` → Game folder
 - `src/custom` → Game folder (วางไว้ข้างๆ DLL)
 
 #### 4. รัน Injector
@@ -137,10 +137,10 @@ Custom message patch for Zenless Zone Zero with simplified build-time message em
 
 #### 1. Installation
 1. Extract zip to Zenless Zone Zero game folder.
-2. Ensure `xeekuma.dll`, `xeeroookuma.exe`, and `custom` are present.
+2. Ensure `xeroxua.dll`, `xeroxuakuma.exe`, and `custom` are present.
 
 #### 2. Run Injector
-Run `xeeroookuma.exe` to inject the DLL. (Run as Admin)
+Run `xeroxuakuma.exe` to inject the DLL. (Run as Admin)
 
 #### 3. Edit Message
 1. Open `custom` file in game folder with Notepad.
@@ -169,7 +169,7 @@ zig build
 
 #### 3. Deploy Files
 Copy both files to your game folder:
-- `zig-out/bin/xeekuma.dll` → Game folder
+- `zig-out/bin/xeroxua.dll` → Game folder
 - `src/custom` → Game folder (place next to DLL)
 
 #### 4. Run Injector

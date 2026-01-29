@@ -1,5 +1,5 @@
 .{
-    .name = .xeekuma,
+    .name = .xeroxua,
     .version = "0.0.1",
     .dependencies = .{
         .zigzag = .{
@@ -9,5 +9,5 @@
     },
     .minimum_zig_version = "0.15.1",
     .paths = .{""},
-    .fingerprint = 0x1ffbb97bb2f12115,
+    .fingerprint = 0xc89a6eb4960e253e,
 }

@@ -5,7 +5,7 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{ .default_target = .{ .os_tag = .windows } });
 
     const launcher = b.addExecutable(.{
-        .name = "xeeroookuma",
+        .name = "xeroxuakuma",
         .root_module = b.createModule(.{
             .root_source_file = b.path("injector.zig"),
             .target = target,
@@ -14,7 +14,7 @@ pub fn build(b: *std.Build) void {
     });
 
     const dll = b.addLibrary(.{
-        .name = "xeekuma",
+        .name = "xeroxua",
         .linkage = .dynamic,
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/root.zig"),

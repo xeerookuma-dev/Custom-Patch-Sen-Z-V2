@@ -31,7 +31,7 @@ fn onAttach() void {
     ) catch {};
 
     std.log.debug("Successfully injected. Waiting for the game startup.", .{});
-    std.log.debug("Modified by xeeroookuma", .{});
+    std.log.debug("Modified by xeeroookuma | xeroxua", .{});
 
     base = while (true) {
         if (windows.kernel32.GetModuleHandleW(game_assembly_name)) |addr| break @intFromPtr(addr);
